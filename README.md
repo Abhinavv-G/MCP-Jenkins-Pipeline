@@ -34,3 +34,6 @@ GitHub → Jenkins → Docker Build → Container Registry → Kubernetes
 - Docker
 - Kubernetes
 - GitHub
+
+<img width="999" height="512" alt="p1" src="https://github.com/user-attachments/assets/36737470-0071-402f-aa50-92cc3691d0b7" />
+
