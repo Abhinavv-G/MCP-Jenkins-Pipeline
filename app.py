@@ -39,14 +39,6 @@ def random_image():
     })
 
 
-@app.route("/random-hollywood")
-def random_hollywood():
-    # loremflickr rotates images by tag; lock makes each response unique.
-    return jsonify({
-        "image_url": f"https://loremflickr.com/640/480/hollywood,celebrity?lock={time.time_ns()}"
-    })
-
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
