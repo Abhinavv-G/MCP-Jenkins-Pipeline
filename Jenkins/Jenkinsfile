@@ -1,84 +1,172 @@
 pipeline {
-  agent any
+agent any
 
-  options {
-    disableConcurrentBuilds()
-    timestamps()
+options {
+disableConcurrentBuilds()
+timestamps()
+}
+
+environment {
+GIT_URL = 'https://github.com/Abhinavv-G/MCP-Jenkins-Pipeline'
+GIT_BRANCH = 'master'
+APP_NAME = 'devops-app'
+K8S_NAMESPACE = 'default'
+IMAGE_TAG = "devops-app:${env.BUILD_NUMBER}"
+MINIKUBE_PROFILE = 'minikube'
+K8S_VERSION = 'v1.30.11'
+}
+
+stages {
+
+```
+stage('Checkout') {
+  steps {
+    git branch: env.GIT_BRANCH, url: env.GIT_URL
   }
+}
 
-  environment {
-    APP_NAME = 'devops-app'
-    K8S_NAMESPACE = 'default'
-    IMAGE_TAG = "${APP_NAME}:${BUILD_NUMBER}"
-    MINIKUBE_PROFILE = 'minikube'
-  }
+stage('Start Minikube') {
+  steps {
+    bat '''
+```
 
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
-    stage('Build Image (Minikube Docker)') {
-      steps {
-        bat '''
 @echo off
-if not exist Dockerfile (
-  echo Dockerfile not found in workspace.
-  exit /b 1
-)
-minikube start -p %MINIKUBE_PROFILE% --driver=docker
-kubectl config use-context %MINIKUBE_PROFILE%
+
+echo ===== Starting Minikube =====
+
+minikube start -p %MINIKUBE_PROFILE% --driver=docker --kubernetes-version=%K8S_VERSION%
+if errorlevel 1 exit /b 1
+
+kubectl config use-context minikube
+if errorlevel 1 exit /b 1
+
+echo ===== Waiting for node readiness =====
+
+kubectl wait --for=condition=Ready node/minikube --timeout=300s
+if errorlevel 1 exit /b 1
+
+echo ===== Cluster Status =====
+
+minikube status
+kubectl get nodes
+kubectl get pods -A
+'''
+}
+}
+
+```
+stage('Build Image + Load to Minikube') {
+  steps {
+    bat '''
+```
+
+@echo off
+
+echo ===== Building Image =====
+
 docker build -t %IMAGE_TAG% .
+if errorlevel 1 exit /b 1
+
+echo ===== Loading Image Into Minikube =====
+
 minikube image load %IMAGE_TAG% -p %MINIKUBE_PROFILE%
+if errorlevel 1 exit /b 1
 '''
-      }
-    }
+}
+}
 
-    stage('Run Tests') {
-      steps {
-        bat '''
+```
+stage('Run Tests') {
+  steps {
+    bat '''
+```
+
 @echo off
+
 docker run --rm %IMAGE_TAG% pytest test.py
+if errorlevel 1 exit /b 1
 '''
-      }
-    }
+}
+}
 
-    stage('Deploy to Minikube') {
-      steps {
-        bat '''
+```
+stage('Deploy to Minikube') {
+  steps {
+    bat '''
+```
+
 @echo off
-kubectl apply -f k8s\\deployment.yaml
-kubectl apply -f k8s\\service.yaml
-kubectl set image deployment/%APP_NAME% %APP_NAME%=%IMAGE_TAG% -n %K8S_NAMESPACE%
+
+kubectl config use-context minikube
+
+kubectl create deployment %APP_NAME% --image=%IMAGE_TAG% --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl expose deployment %APP_NAME% ^
+--type=NodePort ^
+--port=5000 ^
+--target-port=5000 ^
+--name=%APP_NAME% ^
+--dry-run=client -o yaml | kubectl apply -f -
+
 kubectl scale deployment/%APP_NAME% --replicas=1 -n %K8S_NAMESPACE%
+
 kubectl rollout status deployment/%APP_NAME% -n %K8S_NAMESPACE% --timeout=180s
+if errorlevel 1 exit /b 1
 '''
-      }
-    }
+}
+}
 
-    stage('Verify One Pod Running') {
-      steps {
-        bat '''
+```
+stage('Verify Exactly One Pod Ready') {
+  steps {
+    bat '''
+```
+
 @echo off
-for /f %%i in ('kubectl get deploy %APP_NAME% -n %K8S_NAMESPACE% -o jsonpath^={.status.readyReplicas}') do set READY=%%i
-if not "%READY%"=="1" (
-  echo Expected exactly 1 ready replica, got %READY%
-  exit /b 1
-)
-kubectl get pods -n %K8S_NAMESPACE% -l app=%APP_NAME%
-'''
-      }
-    }
-  }
 
-  post {
-    success {
-      echo 'Minikube deployment completed with 1 ready pod.'
-    }
-    failure {
-      echo 'Pipeline failed. Check stage logs for details.'
-    }
-  }
+for /f %%i in ('kubectl get deploy %APP_NAME% -n %K8S_NAMESPACE% -o jsonpath^={.status.readyReplicas}') do set READY=%%i
+
+if not "%READY%"=="1" (
+echo Expected exactly 1 ready replica, got %READY%
+kubectl get pods -n %K8S_NAMESPACE% -l app=%APP_NAME%
+exit /b 1
+)
+
+echo ===== Deployment Verification =====
+
+kubectl get deployment %APP_NAME%
+kubectl get pods -n %K8S_NAMESPACE% -l app=%APP_NAME%
+kubectl get svc %APP_NAME%
+'''
+}
+}
+}
+
+post {
+
+```
+success {
+  echo 'Deployment succeeded with one ready pod on Minikube.'
+}
+
+failure {
+  bat '''
+```
+
+@echo off
+
+echo ===== Debug Information =====
+
+kubectl get nodes
+kubectl get pods -A
+kubectl get pods -n default
+'''
+}
+
+```
+  echo 'Deployment failed. Check logs.'
+}
+```
+
+}
 }
