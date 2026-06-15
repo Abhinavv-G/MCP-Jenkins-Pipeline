@@ -1,5 +1,1 @@
-# Ignore embedded git repositories and subfolder git metadata
-**/mcp-jenkins/.git/
-**/mcp/.git/
-mcp-jenkins/
-mcp/
+__pycache__
