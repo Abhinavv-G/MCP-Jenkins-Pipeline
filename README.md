@@ -14,10 +14,6 @@ via MCP, making the entire DevOps workflow AI-orchestrated.
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/f65733f1-501c-4e9e-a813-e9dc079c2f54" />
 
 
-## Pipeline Flow
-Cursor AI → MCP Server → Jenkins → Docker Build → pytest → 
-Docker Hub → Kubernetes (Minikube)
-
 ## Tech Stack
 | Layer | Tool |
 |---|---|
