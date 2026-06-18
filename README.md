@@ -36,9 +36,3 @@ Docker Hub → Kubernetes (Minikube)
 3. Dynamic image generation and validation during test phase
 4. Docker image built and pushed to registry
 5. Deployed to Kubernetes cluster via Minikube
-
-## Key Concepts
-- AI ↔ DevOps toolchain integration via MCP
-- Autonomous pipeline orchestration without manual triggers
-- Container lifecycle management from build to deployment
-- Kubernetes pod scheduling and service exposure
