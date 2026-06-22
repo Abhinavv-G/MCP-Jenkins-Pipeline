@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    print("Recieved a Requestzzzz")
+    print("Recieved a Request")
     return jsonify({"status": "ok", "message": "System Health API is running"})
 
 @app.route("/health")
@@ -24,11 +24,11 @@ def info():
     })
 
 
-@app.route("/get_ma_infoz")
-def get_ma_infoz():
+@app.route("/get_my_info")
+def get_my_info():
     return jsonify({
-        "namez": "shank",
-        "gamez": "devops"
+        "name": "abhinav",
+        "game": "devops-engineer"
     })
 
 
