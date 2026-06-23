@@ -1,3 +1,4 @@
+print("LOADED APP.PY")
 from flask import Flask, jsonify
 import platform
 import os
@@ -24,7 +25,7 @@ def info():
     })
 
 
-@app.route("/get_my_info")
+@app.route("/get-my-info")
 def get_my_info():
     return jsonify({
         "name": "abhinav",
@@ -41,5 +42,6 @@ def random_image():
 
 
 if __name__ == "__main__":
+    print(app.url_map)
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
