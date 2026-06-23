@@ -11,7 +11,8 @@ This project lets an AI agent (Cursor) control Jenkins programmatically
 via MCP, making the entire DevOps workflow AI-orchestrated.
 
 ## Architecture
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/f65733f1-501c-4e9e-a813-e9dc079c2f54" />
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/d6bbb042-0b28-46a4-90fd-7603cc1f831f" />
 
 
 ## Tech Stack
