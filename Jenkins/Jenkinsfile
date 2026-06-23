@@ -8,7 +8,7 @@ timestamps()
 
 environment {
 GIT_URL = 'https://github.com/Abhinavv-G/MCP-Jenkins-Pipeline'
-GIT_BRANCH = 'master'
+GIT_BRANCH = 'main'
 APP_NAME = 'devops-app'
 K8S_NAMESPACE = 'default'
 IMAGE_TAG = "devops-app:${env.BUILD_NUMBER}"
